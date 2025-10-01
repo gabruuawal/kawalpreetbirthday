@@ -20,6 +20,7 @@
       flex-direction: column;
       justify-content: flex-start;
       align-items: center;
+      overflow-x: hidden;
     }
 
     h1 {
@@ -45,8 +46,9 @@
       position: relative;
       overflow: hidden;
       border-radius: 16px;
-      box-shadow: 0 0 25px rgba(0,0,0,0.5);
+      box-shadow: 0 0 40px rgba(255, 105, 180, 0.6), 0 0 60px rgba(255, 182, 193, 0.4);
       background: #000;
+      display: none; /* hidden until celebration starts */
     }
 
     #slideshow img {
@@ -64,7 +66,6 @@
       transform: scale(1);
     }
 
-    /* Sparkle Overlay */
     .overlay {
       position: absolute;
       top: 0; left: 0;
@@ -72,9 +73,9 @@
       pointer-events: none;
     }
     .sparkles {
-      background: url("https://i.imgur.com/5MZocCz.png") repeat;
+      background: url("https://i.ibb.co/8jJrF3S/sparkle.png") repeat;
       animation: sparkleMove 6s linear infinite;
-      opacity: 0.4;
+      opacity: 0.3;
       mix-blend-mode: screen;
     }
     @keyframes sparkleMove {
@@ -89,6 +90,7 @@
       color: #fff;
       text-shadow: 0 0 15px #ff0080, 0 0 25px #ff0080, 0 0 35px #ff0000;
       animation: pulse 1.5s infinite alternate;
+      display: none; /* hidden until start */
     }
     @keyframes pulse {
       from { transform: scale(1); opacity: 0.9; }
@@ -103,18 +105,55 @@
     }
 
     audio {
-      margin-top: 15px;
-      width: 90%;
-      max-width: 400px;
+      display: none; /* keep hidden, play in background */
+    }
+
+    /* Confetti styles */
+    .confetti {
+      position: fixed;
+      top: -10px;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      opacity: 0.7;
+      animation: fall linear forwards;
+      z-index: 9999;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Celebration button */
+    #startBtn {
+      background: linear-gradient(135deg, #ff0080, #ff8c00);
+      color: #fff;
+      font-size: 1.2rem;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      margin-top: 20px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    #startBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(0,0,0,0.4);
     }
   </style>
 </head>
 <body>
   <h1>🎉 Happy Birthday, Kawalpreet! 🎉</h1>
-  <p>Upload your favorite pictures and enjoy your surprise 💝✨</p>
+  <p>Upload your favorite pictures and get ready for your surprise 💝✨</p>
 
   <input type="file" id="fileInput" multiple accept="image/*">
-  
+
+  <button id="startBtn">✨ Start Celebration ✨</button>
+
   <div id="slideshow">
     <div class="overlay sparkles"></div>
   </div>
@@ -122,7 +161,7 @@
   <div class="message">💖 Lots of Love, Kawalpreet! 💖</div>
 
   <!-- Background Music -->
-  <audio id="bgMusic" controls autoplay loop>
+  <audio id="bgMusic" loop>
     <source src="https://www.bensound.com/bensound-music/bensound-sunny.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
@@ -130,8 +169,12 @@
   <script>
     const fileInput = document.getElementById('fileInput');
     const slideshow = document.getElementById('slideshow');
+    const message = document.querySelector('.message');
+    const bgMusic = document.getElementById('bgMusic');
+    const startBtn = document.getElementById('startBtn');
     let images = [];
     let current = 0;
+    let slideshowInterval;
 
     fileInput.addEventListener('change', (event) => {
       images = [];
@@ -143,21 +186,46 @@
         slideshow.appendChild(img);
         images.push(img);
       }
-
-      if (images.length > 0) {
-        images[0].classList.add('active');
-        startSlideshow();
-      }
     });
 
     function startSlideshow() {
-      setInterval(() => {
-        if (images.length === 0) return;
-        images[current].classList.remove('active');
-        current = (current + 1) % images.length;
-        images[current].classList.add('active');
-      }, 3500);
+      if (images.length > 0) {
+        images[0].classList.add('active');
+        slideshowInterval = setInterval(() => {
+          images[current].classList.remove('active');
+          current = (current + 1) % images.length;
+          images[current].classList.add('active');
+        }, 3500);
+      }
     }
+
+    // 🎊 Continuous Confetti generator
+    function launchConfetti() {
+      let confetti = document.createElement("div");
+      confetti.classList.add("confetti");
+      document.body.appendChild(confetti);
+
+      confetti.style.left = Math.random() * 100 + "vw";
+      confetti.style.backgroundColor =
+        `hsl(${Math.random() * 360}, 70%, 60%)`;
+      confetti.style.width = confetti.style.height =
+        Math.random() * 8 + 4 + "px";
+      confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
+
+      setTimeout(() => confetti.remove(), 5000);
+    }
+
+    // Start button event
+    startBtn.addEventListener('click', () => {
+      startBtn.style.display = "none";
+      fileInput.style.display = "none";
+      slideshow.style.display = "block";
+      message.style.display = "block";
+
+      bgMusic.play();
+      startSlideshow();
+      setInterval(launchConfetti, 200);
+    });
   </script>
 </body>
 </html>
