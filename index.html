@@ -56,15 +56,21 @@
     }
 
     #slideshow img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center; 
-      background: #000;
-      position: absolute;
-      opacity: 0;
-      transition: opacity 1.5s ease-in-out;
-    }
+  width: 100%;
+  height: 100%;
+  
+  /* These ensure the image covers the entire 4:5 container */
+  object-fit: cover;
+  object-position: center; 
+  
+  /* Ensure the image takes up the full space allocated to it */
+  display: block; 
+  
+  background: #000;
+  position: absolute;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
     /* ---------------------------------------------------- */
 
 
@@ -251,3 +257,4 @@
   </script>
 </body>
 </html>
+
